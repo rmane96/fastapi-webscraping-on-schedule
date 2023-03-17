@@ -1,5 +1,5 @@
 .env
 /venv
 /nb
-/bundle
+bundle
 __pycache__
