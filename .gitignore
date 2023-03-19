@@ -3,3 +3,5 @@
 /nb
 app/bundle
 __pycache__
+.ipynb_checkpoints
+bundle
