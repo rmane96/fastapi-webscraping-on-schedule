@@ -35,6 +35,7 @@ async def products_list_view():
     return list(Product.objects.all())
 
 
+
 @app.post("/events/scrape")
 async def create_scrape_event(data:ProductListSchema):
     product, scrape_obj = add_scrape_event(data.dict())
@@ -44,13 +45,26 @@ async def create_scrape_event(data:ProductListSchema):
 
 @app.get("/products/{asin}")
 def products_detail_view(asin):
-    data = dict(Product.objects.get(asin=asin))
-    events = list(ProductScrapeEvent.objects().filter(asin=asin).limit(10))
-    events = [ProductScrapeEventDetailSchema(**x) for x in events]
-    data['events'] = events
-    data['events_url'] = f"/products/{asin}/events"
-    return data
+    try:
+        data = dict(Product.objects.get(asin=asin))
+        events = list(ProductScrapeEvent.objects().filter(asin=asin).limit(10))
+        events = [ProductScrapeEventDetailSchema(**x) for x in events]
+        data['events'] = events
+        data['events_url'] = f"/products/{asin}/events"
+        return data
+    except Exception:
+        data = {
+            "error" : "Not Found",
+            "msg" : f" '{asin}' does not exists"
+        }
+        return data
+
+
 
 @app.get("/products/{asin}/events", response_model=List[ProductScrapeEventDetailSchema])
 def products_scrapes_list_view(asin):
     return list(ProductScrapeEvent.objects().filter(asin=asin))
+
+
+
+
