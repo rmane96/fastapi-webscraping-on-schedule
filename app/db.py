@@ -1,5 +1,12 @@
 import os
 import pathlib
+from cassandra.cluster import DEFAULT_MAX_CONNECTIONS_PER_LOCAL_HOST 
+
+
+
+DEFAULT_MAX_CONNECTIONS_PER_LOCAL_HOST = 3 
+
+# cass_cluster_set_protocol_version(cluster, CASS_PROTOCOL_VERSION_V4)
 
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
@@ -19,7 +26,7 @@ def get_cluster():
         'secure_connect_bundle': CLUSTER_BUNDLE
     }
     auth_provider = PlainTextAuthProvider(ASTRA_DB_CLIENT_ID, ASTRA_DB_CLIENT_SECRET)
-    cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
+    cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider,protocol_version=4)
     return cluster
 
 
