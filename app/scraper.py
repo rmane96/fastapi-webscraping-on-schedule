@@ -139,10 +139,3 @@ class Scraper:
             "title": title_str,
             **dataset
         }
-        
-        
-        
-        
-        
-
-

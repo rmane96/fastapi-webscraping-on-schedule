@@ -13,9 +13,11 @@ class ProductScrapeEventSchema(BaseModel):
     title: Optional[str]
 
 class ProductListSchema(BaseModel):
-    asin : str
-    title : str
-    price_str : Optional[str]
+    asin: str
+    title: Optional[str]
+    price_str: Optional[str]
+    # brand: Optional[str]
+    # country_of_origin: Optional[str]
     
 class ProductScrapeEventDetailSchema(BaseModel):
     asin : str

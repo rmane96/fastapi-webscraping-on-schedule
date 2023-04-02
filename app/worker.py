@@ -1,7 +1,7 @@
 from celery import Celery
 from celery.signals import beat_init, worker_process_init
 from app.config import get_settings
-from app import db, models
+from app import db, models, schemas, scraper, crud
 from cassandra.cqlengine import connection
 from cassandra.cqlengine.management import sync_table
 from celery.schedules import crontab
@@ -37,7 +37,7 @@ worker_process_init.connect(celery_on_startup)
 @celery_app.on_after_configure.connect  # after configure means run on after init and connection of db
 def setup_periodic_tasks(sender,*args,**kwargs):
     sender.add_periodic_task(
-        crontab(seconds="*/5"),    #scrape every 5 minutes
+        crontab(minute="*/5"),    #scrape every 5 minutes
         scrape_products.s(), 
         )  
     
@@ -56,7 +56,16 @@ def list_products():
 
 @celery_app.task
 def scrape_asin(asin):
-    print(asin)
+    s = scraper.Scraper(asin=asin, endless_scroll=True)
+    dataset =  s.scrape()
+    try:
+        validated_data = schemas.ProductListSchema(**dataset)
+    except: 
+        validated_data = None
+    if validated_data is not None:
+        product , _ = crud.add_scrape_event(validated_data.dict())
+        return asin, True
+    return asin, False
 
 
 @celery_app.task

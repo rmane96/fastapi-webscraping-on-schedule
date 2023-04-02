@@ -9,7 +9,7 @@ celery --app app.worker.celery_app worker -l INFO
 celery --app app.worker.celery_app beat -l INFO
 
 /// celery start beat scheduling and worker process with log
-celery --app app.worker.celery_app worker --beat -s <name> -l INFO
+celery --app app.worker.celery_app worker --beat -s scheduling -l INFO
 
 
 docker run -it --rm -p 6380:6380 redis --port 6380
