@@ -19,3 +19,4 @@ class ProductScrapeEvent(Model):
     asin = columns.Text(index=True) # amazons unique id number, using for indexing
     title = columns.Text()
     price_str = columns.Text()
+  

@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from cassandra.cqlengine.management import sync_table
+from cassandra.cqlengine.query import DoesNotExist
 from app import config
 from app.db import get_session
 from app.models import Product, ProductScrapeEvent
@@ -36,6 +37,8 @@ async def products_list_view():
 
 
 
+
+
 @app.post("/events/scrape")
 async def create_scrape_event(data:ProductListSchema):
     product, scrape_obj = add_scrape_event(data.dict())
@@ -59,8 +62,21 @@ def products_detail_view(asin):
         }
         return data
 
-
-
+@app.delete("/products/{asin}")
+def product_delete_view(asin):
+    try:
+        q = Product.objects.get(asin=asin)
+        
+        
+    except DoesNotExist:
+        raise HTTPException(status_code=404,detail=f"{asin} not found")
+    else:
+        q.delete()
+        for event in ProductScrapeEvent.objects.filter(asin=asin).all():
+            event.delete()
+        
+        return f"{asin} deleted"
+    
 @app.get("/products/{asin}/events", response_model=List[ProductScrapeEventDetailSchema])
 def products_scrapes_list_view(asin):
     return list(ProductScrapeEvent.objects().filter(asin=asin))
